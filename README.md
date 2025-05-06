@@ -4,7 +4,7 @@
 
 
 ![网页预览](static/cartoon/webvisual.png)
-
+![网页预览](static/cartoon/webvisual2.png)
 ## 功能特点
 
 ### 数据统计

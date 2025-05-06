@@ -3,6 +3,10 @@
     --apple-blue: #0071e3;
     --apple-text: #1d1d1f;
     --apple-text-secondary: #86868b;
+    --apple-card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    --apple-hover-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    --apple-border-radius: 20px;
+    --apple-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 body {
@@ -11,143 +15,133 @@ body {
     color: var(--apple-text);
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
+    padding: 2rem 0;
 }
 
 .container {
     max-width: 1200px;
-    padding: 2rem;
+    padding: 0 2rem;
 }
 
-h1, h2, h3, h4, h5, h6 {
-    font-weight: 600;
-    letter-spacing: -0.015em;
+h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 2rem;
+    text-align: center;
+    background: linear-gradient(90deg, #1d1d1f 0%, #434344 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .card {
     background: white;
     border: none;
-    border-radius: 18px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: var(--apple-border-radius);
+    box-shadow: var(--apple-card-shadow);
+    transition: var(--apple-transition);
     overflow: hidden;
+    height: 100%;
 }
 
 .card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-4px);
+    box-shadow: var(--apple-hover-shadow);
 }
 
 .card-body {
-    padding: 1.5rem;
+    padding: 1.75rem;
     position: relative;
-    min-width: 0;
 }
 
 .card-title {
     color: var(--apple-text-secondary);
-    font-size: 0.9rem;
-    font-weight: 500;
+    font-size: 0.85rem;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
 }
 
-.card-body .d-flex.align-items-center {
-    position: relative;
-}
-
-.card-body .card-text {
-    font-size: 1.5rem;
+.card-text {
+    font-size: 1.75rem;
     font-weight: 600;
     color: var(--apple-text);
     margin: 0;
-    padding-right: 0;
-    white-space: nowrap;
-    overflow: visible;
-    text-overflow: clip;
-}
-
-.card-body .btn-sm {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.875rem;
-    position: static;
-    transform: none;
-}
-
-.card-body .btn-sm.ms-2 {
-    margin-left: 0.5rem !important;
-}
-
-.position-relative {
-    min-width: 0;
-    width: 100%;
-}
-
-.btn-sm {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.875rem;
-    position: absolute;
-    right: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
+    line-height: 1.2;
 }
 
 .btn {
     border-radius: 980px;
-    padding: 0.5rem 1.2rem;
+    padding: 0.6rem 1.4rem;
     font-weight: 500;
-    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    transition: var(--apple-transition);
+    border: none;
+}
+
+.btn-sm {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
 }
 
 .btn-primary {
     background-color: var(--apple-blue);
-    border-color: var(--apple-blue);
+    color: white;
 }
 
 .btn-primary:hover {
     background-color: #0077ed;
-    border-color: #0077ed;
     transform: scale(1.02);
 }
 
 .btn-outline-primary {
     color: var(--apple-blue);
-    border-color: var(--apple-blue);
+    border: 1px solid var(--apple-blue);
+    background: transparent;
 }
 
 .btn-outline-primary:hover {
     background-color: var(--apple-blue);
     color: white;
+    transform: scale(1.02);
 }
 
 .table {
     background: white;
-    border-radius: 18px;
+    border-radius: var(--apple-border-radius);
     overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--apple-card-shadow);
+    margin-bottom: 0;
 }
 
 .table thead th {
     background-color: var(--apple-gray);
     border-bottom: none;
     color: var(--apple-text-secondary);
-    font-weight: 500;
+    font-weight: 600;
     text-transform: uppercase;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     letter-spacing: 0.1em;
-    padding: 1rem;
+    padding: 1.25rem 1rem;
 }
 
 .table tbody td {
-    padding: 1rem;
+    padding: 1.25rem 1rem;
     vertical-align: middle;
     border-bottom: 1px solid var(--apple-gray);
+    font-size: 0.95rem;
+}
+
+.table tbody tr:last-child td {
+    border-bottom: none;
 }
 
 .sortable {
     cursor: pointer;
     position: relative;
     transition: color 0.3s ease;
+    padding-right: 1.5rem !important;
 }
 
 .sortable:hover {
@@ -160,69 +154,33 @@ h1, h2, h3, h4, h5, h6 {
     right: 8px;
     color: var(--apple-text-secondary);
     font-size: 0.8rem;
+    opacity: 0.5;
 }
 
 .sortable.asc::after {
     content: '↑';
+    opacity: 1;
 }
 
 .sortable.desc::after {
     content: '↓';
-}
-
-.edit-form {
-    margin-top: 1rem;
-    width: 100%;
-}
-
-.edit-form .input-group {
-    width: 100%;
-}
-
-.input-group {
-    border-radius: 980px;
-    overflow: hidden;
-    width: 100%;
-}
-
-.input-group .btn {
-    position: static;
-    transform: none;
-}
-
-.form-control {
-    border-radius: 980px 0 0 980px;
-    border: 1px solid var(--apple-text-secondary);
-    padding: 0.5rem 1.2rem;
-}
-
-.form-control:focus {
-    box-shadow: none;
-    border-color: var(--apple-blue);
-}
-
-.refresh-balance {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.8rem;
-}
-
-.refresh-balance:hover {
-    transform: rotate(180deg);
+    opacity: 1;
 }
 
 .nav-tabs {
     border: none;
     margin-bottom: 2rem;
+    gap: 0.5rem;
 }
 
 .nav-tabs .nav-link {
     border: none;
     color: var(--apple-text-secondary);
     font-weight: 500;
-    padding: 1rem 2rem;
+    padding: 0.8rem 1.5rem;
     border-radius: 980px;
-    margin-right: 1rem;
-    transition: all 0.3s ease;
+    transition: var(--apple-transition);
+    font-size: 0.95rem;
 }
 
 .nav-tabs .nav-link:hover {
@@ -233,10 +191,11 @@ h1, h2, h3, h4, h5, h6 {
 .nav-tabs .nav-link.active {
     color: white;
     background-color: var(--apple-blue);
+    box-shadow: 0 2px 8px rgba(0, 113, 227, 0.3);
 }
 
 .tab-content {
-    animation: fadeIn 0.6s ease-out;
+    animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @keyframes fadeIn {
@@ -244,27 +203,70 @@ h1, h2, h3, h4, h5, h6 {
     to { opacity: 1; transform: translateY(0); }
 }
 
-.chart-container {
-    background: white;
-    border-radius: 18px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    margin-bottom: 2rem;
+.refresh-balance {
+    padding: 0.4rem;
+    font-size: 0.8rem;
+    transition: var(--apple-transition);
 }
 
-/* 总余额卡片样式 */
+.refresh-balance:hover {
+    transform: rotate(180deg);
+    background-color: rgba(0, 113, 227, 0.1);
+}
+
+.edit-form {
+    margin-top: 1rem;
+    width: 100%;
+}
+
+.edit-form .input-group {
+    width: 100%;
+    gap: 0.5rem;
+}
+
+.input-group {
+    border-radius: 980px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.form-control {
+    border-radius: 980px;
+    border: 1px solid var(--apple-text-secondary);
+    padding: 0.6rem 1.4rem;
+    font-size: 0.95rem;
+    transition: var(--apple-transition);
+}
+
+.form-control:focus {
+    box-shadow: none;
+    border-color: var(--apple-blue);
+}
+
+/* 总余额卡片样式优化 */
 .card-body .gap-3 {
-    gap: 1rem !important;
+    gap: 1.5rem !important;
 }
 
-.card-body .btn-sm {
-    position: static;
-    transform: none;
+.card-body .d-flex.align-items-center {
+    background: rgba(0, 113, 227, 0.05);
+    padding: 0.5rem 1rem;
+    border-radius: 980px;
+    transition: var(--apple-transition);
 }
 
+.card-body .d-flex.align-items-center:hover {
+    background: rgba(0, 113, 227, 0.1);
+}
+
+/* 响应式优化 */
 @media (max-width: 768px) {
     .container {
         padding: 1rem;
+    }
+
+    h1 {
+        font-size: 2rem;
     }
 
     .card {
@@ -272,7 +274,7 @@ h1, h2, h3, h4, h5, h6 {
     }
 
     .table-responsive {
-        border-radius: 18px;
+        border-radius: var(--apple-border-radius);
         overflow: hidden;
     }
 
@@ -281,11 +283,17 @@ h1, h2, h3, h4, h5, h6 {
     }
     
     .card-body .gap-3 {
-        gap: 0.5rem !important;
+        gap: 1rem !important;
     }
     
     .card-body .d-flex.align-items-center {
-        margin-right: 1rem;
+        margin-right: 0.5rem;
         margin-bottom: 0.5rem;
+        padding: 0.4rem 0.8rem;
+    }
+
+    .nav-tabs .nav-link {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
     }
 } 
