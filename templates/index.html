@@ -15,27 +15,29 @@
         
         <!-- 统计卡片 -->
         <div class="row mb-4 g-4">
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">总投入</h5>
                         <div class="d-flex align-items-center">
-                            <p class="card-text" id="totalInvestment">¥0.00</p>
+                            <div class="investment-value" id="totalInvestmentDisplay">
+                                <p class="card-text mb-0" id="totalInvestment">¥0.00</p>
+                            </div>
+                            <div class="investment-edit d-none" id="totalInvestmentEdit">
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="totalInvestmentInput" step="0.01">
+                                    <button class="btn btn-primary" onclick="saveTotalInvestment()">保存</button>
+                                    <button class="btn btn-outline-primary" onclick="cancelEdit('totalInvestment')">取消</button>
+                                </div>
+                            </div>
                             <button class="btn btn-sm btn-outline-primary ms-2" onclick="toggleEdit('totalInvestment')">
                                 <i class="bi bi-pencil"></i>
                             </button>
                         </div>
-                        <div class="edit-form d-none mt-2" id="totalInvestmentEdit">
-                            <div class="input-group">
-                                <input type="number" class="form-control" id="totalInvestmentInput" step="0.01">
-                                <button class="btn btn-primary" onclick="saveTotalInvestment()">保存</button>
-                                <button class="btn btn-outline-primary" onclick="cancelEdit('totalInvestment')">取消</button>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">库存价值</h5>
@@ -56,7 +58,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-1">
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">总利润</h5>

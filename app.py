@@ -190,7 +190,16 @@ def get_data():
         print(f"计算得到的总投入：{total_investment}")
         
         # 计算总价值（账户总余额 + 库存价值）
-        total_value = float(balance_data.get('total_balance', 0))*0.99 + float(inventory_value)*0.965
+        # 确保所有余额都是有效的数字
+        valid_balances = [float(balance) for balance in [
+            balance_data.get('buff_balance', 0.0),
+            balance_data.get('youpin_balance', 0.0),
+            balance_data.get('igxe_balance', 0.0),
+            balance_data.get('c5_balance', 0.0)
+        ] if balance is not None]
+        
+        total_balance = sum(valid_balances)
+        total_value = total_balance * 0.99 + float(inventory_value) * 0.965
         print(f"计算得到的总价值：{total_value}")
         
         # 计算总利润
@@ -214,11 +223,11 @@ def get_data():
             'total_value': round(total_value, 2),
             'total_profit': round(total_profit, 2),
             'profit_ratio': round(profit_ratio, 2),
-            'buff_balance': round(float(balance_data.get('buff_balance', 0)), 2),
-            'youpin_balance': round(float(balance_data.get('youpin_balance', 0)), 2),
-            'igxe_balance': round(float(balance_data.get('igxe_balance', 0)), 2),
-            'c5_balance': round(float(balance_data.get('c5_balance', 0)), 2),
-            'total_balance': round(float(balance_data.get('total_balance', 0)), 2),
+            'buff_balance': round(float(balance_data.get('buff_balance', 0.0) or 0.0), 2),
+            'youpin_balance': round(float(balance_data.get('youpin_balance', 0.0) or 0.0), 2),
+            'igxe_balance': round(float(balance_data.get('igxe_balance', 0.0) or 0.0), 2),
+            'c5_balance': round(float(balance_data.get('c5_balance', 0.0) or 0.0), 2),
+            'total_balance': round(total_balance, 2),
             'buff_total_buy': round(buff_total_buy, 2),
             'buff_total_sale': round(buff_total_sale, 2),
             'buff_net_profit': round(buff_net_profit, 2),
@@ -262,23 +271,60 @@ def update_balance():
         if os.path.exists('data/balance.json'):
             with open('data/balance.json', 'r') as f:
                 balance_data = json.load(f)
+                print("读取到的现有余额数据:", balance_data)
+        
+        # 保存原有余额
+        original_balances = {
+            'buff_balance': balance_data.get('buff_balance'),
+            'youpin_balance': balance_data.get('youpin_balance'),
+            'igxe_balance': balance_data.get('igxe_balance'),
+            'c5_balance': balance_data.get('c5_balance')
+        }
+        
+        # 添加更新状态标记
+        update_status = {
+            'buff_balance': False,
+            'youpin_balance': False,
+            'igxe_balance': False,
+            'c5_balance': False
+        }
         
         # C5使用API获取余额，不需要浏览器
         if platform in ['c5', 'all']:
             print("正在更新C5余额...")
-            c5_balance = get_c5_balance()  # 直接调用API函数
-            balance_data['c5_balance'] = c5_balance
-            print(f"C5余额更新成功: {c5_balance}")
+            try:
+                c5_balance = get_c5_balance()  # 直接调用API函数
+                print(f"C5余额获取结果: {c5_balance}")
+                if c5_balance is not None:  # 只有在成功获取余额时才更新
+                    balance_data['c5_balance'] = c5_balance
+                    update_status['c5_balance'] = True
+                    print(f"C5余额更新成功: {c5_balance}")
+                else:
+                    print("C5余额获取失败，保持原有余额")
+                    balance_data['c5_balance'] = original_balances['c5_balance']  # 保持原有余额
+            except Exception as e:
+                print(f"C5余额更新失败: {str(e)}")
+                balance_data['c5_balance'] = original_balances['c5_balance']  # 保持原有余额
             
             # 如果只更新C5余额，直接返回结果
             if platform == 'c5':
                 # 更新总余额
-                balance_data['total_balance'] = balance_data.get('buff_balance', 0.0) + balance_data.get('youpin_balance', 0.0) + balance_data.get('igxe_balance', 0.0) + c5_balance
+                balance_data['total_balance'] = sum(
+                    balance for balance in [
+                        balance_data.get('buff_balance', 0.0),
+                        balance_data.get('youpin_balance', 0.0),
+                        balance_data.get('igxe_balance', 0.0),
+                        balance_data.get('c5_balance', 0.0)
+                    ] if balance is not None
+                )
                 
+                print("准备返回的C5余额数据:", balance_data)
                 # 保存更新后的余额数据
                 with open('data/balance.json', 'w') as f:
                     json.dump(balance_data, f)
-                    
+                
+                # 添加更新状态到返回数据
+                balance_data['update_status'] = update_status
                 return jsonify(balance_data)
         
         # 其他平台仍然使用浏览器获取
@@ -288,59 +334,99 @@ def update_balance():
         try:
             if platform in ['buff', 'all']:
                 print("正在更新BUFF余额...")
-                driver.get("https://buff.163.com/?game=csgo")
-                time.sleep(1)  # 等待页面加载
-                # 加载BUFF cookies
-                if os.path.exists('data/cookie/buff_cookies.json'):
-                    with open('data/cookie/buff_cookies.json', 'r') as f:
-                        cookies = json.load(f)
-                    for cookie in cookies:
-                        driver.add_cookie(cookie)
-                
-                # 获取BUFF余额
-                buff_balance = get_buff_balance(driver)
-                balance_data['buff_balance'] = buff_balance
-                print(f"BUFF余额更新成功: {buff_balance}")
+                try:
+                    driver.get("https://buff.163.com/?game=csgo")
+                    time.sleep(1)  # 等待页面加载
+                    # 加载BUFF cookies
+                    if os.path.exists('data/cookie/buff_cookies.json'):
+                        with open('data/cookie/buff_cookies.json', 'r') as f:
+                            cookies = json.load(f)
+                        for cookie in cookies:
+                            driver.add_cookie(cookie)
+                    
+                    # 获取BUFF余额
+                    buff_balance = get_buff_balance(driver)
+                    print(f"BUFF余额获取结果: {buff_balance}")
+                    if buff_balance is not None:  # 只有在成功获取余额时才更新
+                        balance_data['buff_balance'] = buff_balance
+                        update_status['buff_balance'] = True
+                        print(f"BUFF余额更新成功: {buff_balance}")
+                    else:
+                        print("BUFF余额获取失败，保持原有余额")
+                        balance_data['buff_balance'] = original_balances['buff_balance']  # 保持原有余额
+                except Exception as e:
+                    print(f"BUFF余额更新失败: {str(e)}")
+                    balance_data['buff_balance'] = original_balances['buff_balance']  # 保持原有余额
 
             if platform in ['igxe', 'all']:
                 print("正在更新IGXE余额...")
-                driver.get("https://www.igxe.cn/")
-                time.sleep(1)  # 等待页面加载
-                # 加载IGXE cookies
-                if os.path.exists('data/cookie/igxe_cookies.json'):
-                    with open('data/cookie/igxe_cookies.json', 'r') as f:
-                        cookies = json.load(f)
-                    for cookie in cookies:
-                        driver.add_cookie(cookie)
-                
-                # 获取IGXE余额
-                igxe_balance = get_igxe_balance(driver)
-                balance_data['igxe_balance'] = igxe_balance
-                print(f"IGXE余额更新成功: {igxe_balance}")
+                try:
+                    driver.get("https://www.igxe.cn/")
+                    time.sleep(1)  # 等待页面加载
+                    # 加载IGXE cookies
+                    if os.path.exists('data/cookie/igxe_cookies.json'):
+                        with open('data/cookie/igxe_cookies.json', 'r') as f:
+                            cookies = json.load(f)
+                        for cookie in cookies:
+                            driver.add_cookie(cookie)
+                    
+                    # 获取IGXE余额
+                    igxe_balance = get_igxe_balance(driver)
+                    print(f"IGXE余额获取结果: {igxe_balance}")
+                    if igxe_balance is not None:  # 只有在成功获取余额时才更新
+                        balance_data['igxe_balance'] = igxe_balance
+                        update_status['igxe_balance'] = True
+                        print(f"IGXE余额更新成功: {igxe_balance}")
+                    else:
+                        print("IGXE余额获取失败，保持原有余额")
+                        balance_data['igxe_balance'] = original_balances['igxe_balance']  # 保持原有余额
+                except Exception as e:
+                    print(f"IGXE余额更新失败: {str(e)}")
+                    balance_data['igxe_balance'] = original_balances['igxe_balance']  # 保持原有余额
 
             if platform in ['youpin', 'all']:
                 print("正在更新悠悠有品余额...")
-                driver.get("https://www.youpin898.com/")
-                time.sleep(1)  # 等待页面加载
-                # 加载悠悠有品 cookies
-                if os.path.exists('data/cookie/youpin_cookies.json'):
-                    with open('data/cookie/youpin_cookies.json', 'r') as f:
-                        cookies = json.load(f)
-                    for cookie in cookies:
-                        driver.add_cookie(cookie)
-                
-                # 获取悠悠有品余额
-                youpin_balance = get_youpin_balance(driver)
-                balance_data['youpin_balance'] = youpin_balance
-                print(f"悠悠有品余额更新成功: {youpin_balance}")
+                try:
+                    driver.get("https://www.youpin898.com/")
+                    time.sleep(1)  # 等待页面加载
+                    # 加载悠悠有品 cookies
+                    if os.path.exists('data/cookie/youpin_cookies.json'):
+                        with open('data/cookie/youpin_cookies.json', 'r') as f:
+                            cookies = json.load(f)
+                        for cookie in cookies:
+                            driver.add_cookie(cookie)
+                    
+                    # 获取悠悠有品余额
+                    youpin_balance = get_youpin_balance(driver)
+                    print(f"悠悠有品余额获取结果: {youpin_balance}")
+                    if youpin_balance is not None:  # 只有在成功获取余额时才更新
+                        balance_data['youpin_balance'] = youpin_balance
+                        update_status['youpin_balance'] = True
+                        print(f"悠悠有品余额更新成功: {youpin_balance}")
+                    else:
+                        print("悠悠有品余额获取失败，保持原有余额")
+                        balance_data['youpin_balance'] = original_balances['youpin_balance']  # 保持原有余额
+                except Exception as e:
+                    print(f"悠悠有品余额更新失败: {str(e)}")
+                    balance_data['youpin_balance'] = original_balances['youpin_balance']  # 保持原有余额
 
             # 更新总余额
-            balance_data['total_balance'] = balance_data.get('buff_balance', 0.0) + balance_data.get('youpin_balance', 0.0) + balance_data.get('igxe_balance', 0.0) + balance_data.get('c5_balance', 0.0)
+            balance_data['total_balance'] = sum(
+                balance for balance in [
+                    balance_data.get('buff_balance', 0.0),
+                    balance_data.get('youpin_balance', 0.0),
+                    balance_data.get('igxe_balance', 0.0),
+                    balance_data.get('c5_balance', 0.0)
+                ] if balance is not None
+            )
             
+            print("准备返回的最终余额数据:", balance_data)
             # 保存更新后的余额数据
             with open('data/balance.json', 'w') as f:
                 json.dump(balance_data, f)
             
+            # 添加更新状态到返回数据
+            balance_data['update_status'] = update_status
             return jsonify(balance_data)
             
         finally:

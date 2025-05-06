@@ -276,21 +276,41 @@ async function updateBalance(platform, button) {
     icon.classList.add('fa-spin');
     
     try {
-        console.log(`正在更新${platform}余额...`);
+        console.log(`开始更新${platform}余额...`);
         const response = await fetch(`/api/update_balance?platform=${platform}`, {
             method: 'POST'
         });
         
         const data = await response.json();
+        console.log('收到服务器响应数据:', data);
         
         if (!response.ok) {
             throw new Error(data.error || '更新失败');
         }
         
+        // 检查当前平台的余额状态
+        const platformMap = {
+            'buff': 'BUFF',
+            'youpin': '悠悠有品',
+            'igxe': 'IGXE',
+            'c5': 'C5'
+        };
+        
+        const currentPlatform = platformMap[platform];
+        const updateStatus = data.update_status[`${platform}_balance`];
+        
+        console.log(`检查${currentPlatform}余额更新状态:`, updateStatus);
+        
         // 更新显示的余额
         updateBalanceDisplay(data);
         
-        showToast('更新成功', 'success');
+        if (!updateStatus) {
+            console.log(`${currentPlatform}余额更新失败`);
+            showToast(`${currentPlatform}余额更新失败，保持原有余额`, 'error');
+        } else {
+            console.log(`${currentPlatform}余额更新成功`);
+            showToast(`${currentPlatform}余额更新成功`, 'success');
+        }
     } catch (error) {
         console.error('更新余额失败:', error);
         showToast('更新失败: ' + error.message, 'error');
@@ -302,25 +322,225 @@ async function updateBalance(platform, button) {
 
 // 更新余额显示
 function updateBalanceDisplay(data) {
-    if (data.buff_balance !== undefined) {
+    console.log('开始更新余额显示');
+    console.log('当前数据:', data);
+    
+    if (data.buff_balance !== undefined && data.buff_balance !== null) {
+        console.log('更新BUFF余额显示:', data.buff_balance);
         document.getElementById('buffBalance').textContent = `¥${data.buff_balance.toFixed(2)}`;
+    } else {
+        console.log('BUFF余额未更新');
     }
-    if (data.youpin_balance !== undefined) {
+    
+    if (data.youpin_balance !== undefined && data.youpin_balance !== null) {
+        console.log('更新悠悠有品余额显示:', data.youpin_balance);
         document.getElementById('youpinBalance').textContent = `¥${data.youpin_balance.toFixed(2)}`;
+    } else {
+        console.log('悠悠有品余额未更新');
     }
-    if (data.igxe_balance !== undefined) {
+    
+    if (data.igxe_balance !== undefined && data.igxe_balance !== null) {
+        console.log('更新IGXE余额显示:', data.igxe_balance);
         document.getElementById('igxeBalance').textContent = `¥${data.igxe_balance.toFixed(2)}`;
+    } else {
+        console.log('IGXE余额未更新');
     }
-    if (data.c5_balance !== undefined) {
+    
+    if (data.c5_balance !== undefined && data.c5_balance !== null) {
+        console.log('更新C5余额显示:', data.c5_balance);
         document.getElementById('c5Balance').textContent = `¥${data.c5_balance.toFixed(2)}`;
+    } else {
+        console.log('C5余额未更新');
     }
-    if (data.total_balance !== undefined) {
+    
+    if (data.total_balance !== undefined && data.total_balance !== null) {
+        console.log('更新总余额显示:', data.total_balance);
         document.getElementById('totalBalance').textContent = `¥${data.total_balance.toFixed(2)}`;
+    } else {
+        console.log('总余额未更新');
     }
 }
 
 // 显示提示消息
 function showToast(message, type = 'info') {
-    // 这里可以添加一个简单的提示框实现
-    alert(message);
+    console.log('显示提示消息:', message, '类型:', type);
+    
+    // 创建toast容器（如果不存在）
+    let toastContainer = document.getElementById('toast-container');
+    if (!toastContainer) {
+        toastContainer = document.createElement('div');
+        toastContainer.id = 'toast-container';
+        toastContainer.style.position = 'fixed';
+        toastContainer.style.top = '20px';
+        toastContainer.style.right = '20px';
+        toastContainer.style.zIndex = '9999';
+        document.body.appendChild(toastContainer);
+    }
+    
+    // 创建toast元素
+    const toast = document.createElement('div');
+    toast.className = `toast align-items-center text-white bg-${type === 'error' ? 'danger' : type === 'success' ? 'success' : 'info'} border-0`;
+    toast.setAttribute('role', 'alert');
+    toast.setAttribute('aria-live', 'assertive');
+    toast.setAttribute('aria-atomic', 'true');
+    
+    // 设置toast内容
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">
+                ${message}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    `;
+    
+    // 添加到容器
+    toastContainer.appendChild(toast);
+    
+    // 初始化Bootstrap Toast
+    const bsToast = new bootstrap.Toast(toast, {
+        animation: true,
+        autohide: true,
+        delay: 3000
+    });
+    
+    // 显示toast
+    bsToast.show();
+    
+    // 监听隐藏事件，移除元素
+    toast.addEventListener('hidden.bs.toast', () => {
+        toast.remove();
+    });
+}
+
+// 切换编辑模式
+function toggleEdit(elementId) {
+    const displayElement = document.getElementById(`${elementId}Display`);
+    const editElement = document.getElementById(`${elementId}Edit`);
+    const currentValue = document.getElementById(elementId).textContent.replace('¥', '');
+    const input = document.getElementById(`${elementId}Input`);
+    const editButton = document.querySelector(`button[onclick="toggleEdit('${elementId}')"]`);
+    
+    if (editElement.classList.contains('d-none')) {
+        // 显示编辑表单
+        displayElement.classList.add('d-none');
+        editElement.classList.remove('d-none');
+        input.value = currentValue;
+        input.focus(); // 自动聚焦到输入框
+        // 隐藏编辑按钮
+        editButton.classList.add('d-none');
+    } else {
+        // 隐藏编辑表单
+        displayElement.classList.remove('d-none');
+        editElement.classList.add('d-none');
+        // 显示编辑按钮
+        editButton.classList.remove('d-none');
+    }
+}
+
+// 保存总投入
+async function saveTotalInvestment() {
+    const input = document.getElementById('totalInvestmentInput');
+    const newValue = parseFloat(input.value);
+    const editButton = document.querySelector('button[onclick="toggleEdit(\'totalInvestment\')"]');
+    
+    if (isNaN(newValue) || newValue < 0) {
+        showToast('请输入有效的金额', 'error');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/update_total_investment', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                total_investment: newValue
+            })
+        });
+        
+        if (response.ok) {
+            // 更新显示
+            document.getElementById('totalInvestment').textContent = `¥${newValue.toFixed(2)}`;
+            // 切换回显示模式
+            toggleEdit('totalInvestment');
+            // 显示编辑按钮
+            editButton.classList.remove('d-none');
+            // 重新加载数据以更新其他相关数值
+            loadData();
+            showToast('总投入更新成功', 'success');
+        } else {
+            throw new Error('更新失败');
+        }
+    } catch (error) {
+        console.error('更新总投入失败:', error);
+        showToast('更新失败: ' + error.message, 'error');
+    }
+}
+
+// 取消编辑
+function cancelEdit(elementId) {
+    const displayElement = document.getElementById(`${elementId}Display`);
+    const editElement = document.getElementById(`${elementId}Edit`);
+    const editButton = document.querySelector(`button[onclick="toggleEdit('${elementId}')"]`);
+    
+    displayElement.classList.remove('d-none');
+    editElement.classList.add('d-none');
+    // 显示编辑按钮
+    editButton.classList.remove('d-none');
+}
+
+// 更新库存价值
+async function updateInventoryValue() {
+    try {
+        const response = await fetch('/api/update_inventory_value', {
+            method: 'POST'
+        });
+        
+        if (!response.ok) {
+            throw new Error('更新失败');
+        }
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // 更新显示
+            document.getElementById('currentValue').textContent = `¥${data.inventory_value.toFixed(2)}`;
+            // 重新加载数据以更新其他相关数值
+            loadData();
+            showToast('库存价值更新成功', 'success');
+        } else {
+            throw new Error(data.error || '更新失败');
+        }
+    } catch (error) {
+        console.error('更新库存价值失败:', error);
+        showToast('更新失败: ' + error.message, 'error');
+    }
+}
+
+// 更新总余额
+async function updateTotalBalance() {
+    try {
+        const response = await fetch('/api/update_balance?platform=all', {
+            method: 'POST'
+        });
+        
+        if (!response.ok) {
+            throw new Error('更新失败');
+        }
+        
+        const data = await response.json();
+        
+        // 更新显示的余额
+        updateBalanceDisplay(data);
+        
+        // 重新加载数据以更新其他相关数值
+        loadData();
+        
+        showToast('总余额更新成功', 'success');
+    } catch (error) {
+        console.error('更新总余额失败:', error);
+        showToast('更新失败: ' + error.message, 'error');
+    }
 } 

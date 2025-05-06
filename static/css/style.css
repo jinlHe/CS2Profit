@@ -7,41 +7,66 @@
     --apple-hover-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
     --apple-border-radius: 20px;
     --apple-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --apple-success: #34c759;
+    --apple-warning: #ff9500;
+    --apple-danger: #ff3b30;
+    --apple-card-bg: rgba(255, 255, 255, 0.8);
+    --apple-backdrop-blur: blur(20px);
+    --card-min-height: 180px;
+    --card-spacing: 1.5rem;
+    --card-padding: 2rem;
 }
 
 body {
     font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
-    background-color: var(--apple-gray);
+    background: linear-gradient(135deg, #f5f5f7 0%, #ffffff 100%);
     color: var(--apple-text);
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
-    padding: 2rem 0;
+    padding: 3rem 0;
+    min-height: 100vh;
 }
 
 .container {
-    max-width: 1200px;
-    padding: 0 2rem;
+    max-width: 1400px;
+    padding: 0 2.5rem;
 }
 
 h1 {
-    font-size: 2.5rem;
+    font-size: 3rem;
     font-weight: 700;
     letter-spacing: -0.02em;
-    margin-bottom: 2rem;
+    margin-bottom: 3rem;
     text-align: center;
     background: linear-gradient(90deg, #1d1d1f 0%, #434344 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    position: relative;
+}
+
+h1::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 4px;
+    background: var(--apple-blue);
+    border-radius: 2px;
 }
 
 .card {
-    background: white;
+    background: var(--apple-card-bg);
     border: none;
     border-radius: var(--apple-border-radius);
     box-shadow: var(--apple-card-shadow);
     transition: var(--apple-transition);
     overflow: hidden;
     height: 100%;
+    min-height: var(--card-min-height);
+    backdrop-filter: var(--apple-backdrop-blur);
+    -webkit-backdrop-filter: var(--apple-backdrop-blur);
 }
 
 .card:hover {
@@ -50,38 +75,64 @@ h1 {
 }
 
 .card-body {
-    padding: 1.75rem;
+    padding: var(--card-padding);
     position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .card-title {
     color: var(--apple-text-secondary);
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    margin-bottom: 0.75rem;
+    margin-bottom: 1.25rem;
 }
 
 .card-text {
-    font-size: 1.75rem;
+    font-size: 2.25rem;
     font-weight: 600;
     color: var(--apple-text);
     margin: 0;
-    line-height: 1.2;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .btn {
     border-radius: 980px;
-    padding: 0.6rem 1.4rem;
+    padding: 0.7rem 1.6rem;
     font-weight: 500;
     font-size: 0.9rem;
     transition: var(--apple-transition);
     border: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translate(-50%, -50%) scale(0);
+    border-radius: 50%;
+    transition: transform 0.3s ease;
+}
+
+.btn:hover::after {
+    transform: translate(-50%, -50%) scale(2);
 }
 
 .btn-sm {
-    padding: 0.4rem 0.8rem;
+    padding: 0.5rem 1rem;
     font-size: 0.8rem;
 }
 
@@ -108,29 +159,36 @@ h1 {
 }
 
 .table {
-    background: white;
+    background: var(--apple-card-bg);
     border-radius: var(--apple-border-radius);
     overflow: hidden;
     box-shadow: var(--apple-card-shadow);
     margin-bottom: 0;
+    backdrop-filter: var(--apple-backdrop-blur);
+    -webkit-backdrop-filter: var(--apple-backdrop-blur);
 }
 
 .table thead th {
-    background-color: var(--apple-gray);
+    background-color: rgba(245, 245, 247, 0.8);
     border-bottom: none;
     color: var(--apple-text-secondary);
     font-weight: 600;
     text-transform: uppercase;
     font-size: 0.75rem;
     letter-spacing: 0.1em;
-    padding: 1.25rem 1rem;
+    padding: 1.5rem 1.25rem;
 }
 
 .table tbody td {
-    padding: 1.25rem 1rem;
+    padding: 1.5rem 1.25rem;
     vertical-align: middle;
-    border-bottom: 1px solid var(--apple-gray);
+    border-bottom: 1px solid rgba(245, 245, 247, 0.5);
     font-size: 0.95rem;
+    transition: var(--apple-transition);
+}
+
+.table tbody tr:hover td {
+    background-color: rgba(245, 245, 247, 0.3);
 }
 
 .table tbody tr:last-child td {
@@ -155,32 +213,42 @@ h1 {
     color: var(--apple-text-secondary);
     font-size: 0.8rem;
     opacity: 0.5;
+    transition: var(--apple-transition);
 }
 
 .sortable.asc::after {
     content: '↑';
     opacity: 1;
+    color: var(--apple-blue);
 }
 
 .sortable.desc::after {
     content: '↓';
     opacity: 1;
+    color: var(--apple-blue);
 }
 
 .nav-tabs {
     border: none;
     margin-bottom: 2rem;
-    gap: 0.5rem;
+    gap: 0.75rem;
+    padding: 0.5rem;
+    background: var(--apple-card-bg);
+    border-radius: var(--apple-border-radius);
+    backdrop-filter: var(--apple-backdrop-blur);
+    -webkit-backdrop-filter: var(--apple-backdrop-blur);
 }
 
 .nav-tabs .nav-link {
     border: none;
     color: var(--apple-text-secondary);
     font-weight: 500;
-    padding: 0.8rem 1.5rem;
+    padding: 1rem 1.75rem;
     border-radius: 980px;
     transition: var(--apple-transition);
     font-size: 0.95rem;
+    position: relative;
+    overflow: hidden;
 }
 
 .nav-tabs .nav-link:hover {
@@ -204,9 +272,15 @@ h1 {
 }
 
 .refresh-balance {
-    padding: 0.4rem;
+    padding: 0.5rem;
     font-size: 0.8rem;
     transition: var(--apple-transition);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .refresh-balance:hover {
@@ -221,7 +295,26 @@ h1 {
 
 .edit-form .input-group {
     width: 100%;
-    gap: 0.5rem;
+    gap: 0.75rem;
+    display: flex;
+    flex-wrap: nowrap;
+}
+
+.edit-form .input-group .form-control {
+    flex: 1;
+    min-width: 120px;
+    border-radius: 980px;
+    border: 1px solid var(--apple-text-secondary);
+    padding: 0.7rem 1.5rem;
+    font-size: 0.95rem;
+    transition: var(--apple-transition);
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.edit-form .input-group .form-control:focus {
+    border-color: var(--apple-blue);
+    box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.1);
+    outline: none;
 }
 
 .input-group {
@@ -230,56 +323,92 @@ h1 {
     width: 100%;
 }
 
-.form-control {
-    border-radius: 980px;
-    border: 1px solid var(--apple-text-secondary);
-    padding: 0.6rem 1.4rem;
-    font-size: 0.95rem;
-    transition: var(--apple-transition);
-}
-
-.form-control:focus {
-    box-shadow: none;
-    border-color: var(--apple-blue);
-}
-
-/* 总余额卡片样式优化 */
-.card-body .gap-3 {
-    gap: 1.5rem !important;
-}
-
-.card-body .d-flex.align-items-center {
-    background: rgba(0, 113, 227, 0.05);
-    padding: 0.5rem 1rem;
-    border-radius: 980px;
-    transition: var(--apple-transition);
-}
-
-.card-body .d-flex.align-items-center:hover {
-    background: rgba(0, 113, 227, 0.1);
-}
-
-/* 响应式优化 */
-@media (max-width: 768px) {
+@media (max-width: 1200px) {
     .container {
-        padding: 1rem;
+        max-width: 100%;
+        padding: 0 2rem;
     }
-
-    h1 {
+    
+    .card-text {
         font-size: 2rem;
     }
+}
 
+@media (max-width: 992px) {
+    .container {
+        padding: 0 1.5rem;
+    }
+    
+    .card-text {
+        font-size: 1.75rem;
+    }
+    
+    .card-body {
+        padding: 1.75rem;
+    }
+
+    /* 响应式调整卡片宽度 */
+    .col-md-4:first-child {
+        width: calc(38% - 1rem);
+        flex: 0 0 calc(38% - 1rem);
+        max-width: calc(38% - 1rem);
+    }
+
+    .col-md-4:nth-child(2) {
+        width: calc(35% - 1rem);
+        flex: 0 0 calc(35% - 1rem);
+        max-width: calc(35% - 1rem);
+    }
+
+    .col-md-3 {
+        width: calc(27% - 1rem);
+        flex: 0 0 calc(27% - 1rem);
+        max-width: calc(27% - 1rem);
+    }
+
+    .col-md-1 {
+        width: calc(25% - 1rem);
+        flex: 0 0 calc(25% - 1rem);
+        max-width: calc(25% - 1rem);
+    }
+
+    .col-md-10 {
+        width: calc(85% - 1rem);
+        flex: 0 0 calc(85% - 1rem);
+        max-width: calc(85% - 1rem);
+    }
+
+    .col-md-2 {
+        width: calc(15% - 1rem);
+        flex: 0 0 calc(15% - 1rem);
+        max-width: calc(15% - 1rem);
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 2rem 0;
+    }
+    
+    .container {
+        padding: 0 1rem;
+    }
+    
+    h1 {
+        font-size: 2.25rem;
+        margin-bottom: 2rem;
+    }
+    
     .card {
-        margin-bottom: 1rem;
+        min-height: 160px;
     }
-
-    .table-responsive {
-        border-radius: var(--apple-border-radius);
-        overflow: hidden;
+    
+    .card-body {
+        padding: 1.5rem;
     }
-
-    .card-body .d-flex.flex-wrap {
-        justify-content: flex-start !important;
+    
+    .card-text {
+        font-size: 1.5rem;
     }
     
     .card-body .gap-3 {
@@ -287,13 +416,310 @@ h1 {
     }
     
     .card-body .d-flex.align-items-center {
-        margin-right: 0.5rem;
-        margin-bottom: 0.5rem;
-        padding: 0.4rem 0.8rem;
+        padding: 0.5rem 1rem;
+    }
+    
+    .row.mb-4.g-4 {
+        --bs-gutter-x: 1rem;
+        --bs-gutter-y: 1rem;
     }
 
-    .nav-tabs .nav-link {
+    /* 移动端调整库存价值卡片宽度 */
+    .col-md-4:nth-child(2) {
+        width: 100%;
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    .col-md-1 {
+        width: 100%;
+        flex: 0 0 100%;
+        max-width: 100%;
+        margin-right: 0;
+        padding-right: 0;
+        margin-top: 1rem;
+    }
+
+    .col-md-1 .card {
+        border-radius: var(--apple-border-radius);
+    }
+
+    .col-md-1 .card-body {
+        padding: 1.5rem;
+    }
+
+    .col-md-1 .card-text {
+        font-size: 1.5rem;
+    }
+
+    .col-12 {
+        padding-right: 1rem;
+    }
+}
+
+/* 确保数值不会换行 */
+.investment-value p,
+#totalInvestment,
+#currentValue,
+#totalValue,
+#totalBalance,
+#buffBalance,
+#youpinBalance,
+#igxeBalance,
+#c5Balance,
+#totalProfit,
+#buffTotalBuy,
+#buffTotalSale,
+#buffNetProfit {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+}
+
+/* 优化表格响应式布局 */
+.table-responsive {
+    margin: 0;
+    padding: 0;
+    border-radius: var(--apple-border-radius);
+}
+
+@media (max-width: 576px) {
+    .card {
+        min-height: 140px;
+    }
+    
+    .card-body {
+        padding: 1.25rem;
+    }
+    
+    .card-text {
+        font-size: 1.25rem;
+    }
+    
+    .card-title {
+        font-size: 0.8rem;
+        margin-bottom: 1rem;
+    }
+}
+
+/* 添加新的动画效果 */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.card {
+    animation: slideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 添加滚动条样式 */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--apple-gray);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--apple-text-secondary);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--apple-blue);
+}
+
+/* 添加文本选择样式 */
+::selection {
+    background: var(--apple-blue);
+    color: white;
+}
+
+/* 统计卡片组样式 */
+.row.mb-4.g-4 {
+    margin-bottom: 2.5rem !important;
+    --bs-gutter-x: 1.5rem;
+    --bs-gutter-y: 1.5rem;
+}
+
+/* 总投入卡片 */
+.col-md-4:first-child {
+    width: calc(32% - 1rem);
+    flex: 0 0 calc(32% - 1rem);
+    max-width: calc(32% - 1rem);
+}
+
+.col-md-4:first-child .card {
+    min-height: var(--card-min-height);
+    background: linear-gradient(135deg, var(--apple-card-bg) 0%, rgba(255, 255, 255, 0.9) 100%);
+}
+
+/* 库存价值卡片特殊样式 */
+.col-md-4:nth-child(2) {
+    width: calc(28% - 1rem);
+    flex: 0 0 calc(28% - 1rem);
+    max-width: calc(28% - 1rem);
+}
+
+.col-md-4:nth-child(2) .card {
+    min-height: var(--card-min-height);
+    background: linear-gradient(135deg, var(--apple-card-bg) 0%, rgba(255, 255, 255, 0.9) 100%);
+}
+
+/* 总价值卡片 */
+.col-md-3 {
+    width: calc(22% - 1rem);
+    flex: 0 0 calc(22% - 1rem);
+    max-width: calc(22% - 1rem);
+}
+
+.col-md-3 .card {
+    min-height: var(--card-min-height);
+    background: linear-gradient(135deg, var(--apple-card-bg) 0%, rgba(255, 255, 255, 0.9) 100%);
+}
+
+/* 总利润卡片 */
+.col-md-1 {
+    width: calc(23% - 1rem);
+    flex: 0 0 calc(23% - 1rem);
+    max-width: calc(23% - 1rem);
+    margin-right: -1rem;
+    padding-right: 1rem;
+}
+
+.col-md-1 .card {
+    min-height: var(--card-min-height);
+    background: linear-gradient(135deg, var(--apple-card-bg) 0%, rgba(255, 255, 255, 0.9) 100%);
+    border-radius: var(--apple-border-radius);
+}
+
+.col-md-1 .card-body {
+    padding: 1.5rem;
+}
+
+.col-md-1 .card-title {
+    font-size: 0.8rem;
+    margin-bottom: 0.75rem;
+}
+
+.col-md-1 .card-text {
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.col-md-1 .text-muted.small {
+    font-size: 0.75rem;
+    margin-bottom: 0;
+}
+
+/* 总余额卡片 */
+.col-12 {
+    padding-right: 0;
+}
+
+.col-12 .card {
+    min-height: var(--card-min-height);
+    background: linear-gradient(135deg, var(--apple-card-bg) 0%, rgba(255, 255, 255, 0.9) 100%);
+}
+
+/* 总余额卡片特殊样式 */
+.card-body .gap-3 {
+    gap: 2rem !important;
+}
+
+.card-body .d-flex.align-items-center {
+    background: rgba(0, 113, 227, 0.05);
+    padding: 0.75rem 1.25rem;
+    border-radius: 980px;
+    transition: var(--apple-transition);
+    min-width: 0;
+}
+
+.card-body .d-flex.align-items-center:hover {
+    background: rgba(0, 113, 227, 0.1);
+}
+
+.card-body .d-flex.align-items-center span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+}
+
+/* 交易统计卡片组 */
+.row.mb-4.g-4:last-of-type {
+    margin-bottom: 3rem !important;
+}
+
+/* 总投入卡片编辑状态样式 */
+.investment-edit {
+    flex: 1;
+    min-width: 0;
+    max-width: 280px;
+}
+
+.investment-edit .input-group {
+    width: 100%;
+    gap: 0.5rem;
+    display: flex;
+    flex-wrap: nowrap;
+}
+
+.investment-edit .input-group .form-control {
+    flex: 1;
+    min-width: 0;
+    max-width: 120px;
+    border-radius: 980px;
+    border: 1px solid var(--apple-text-secondary);
+    padding: 0.7rem 1.5rem;
+    font-size: 0.95rem;
+    transition: var(--apple-transition);
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.investment-edit .input-group .btn {
+    white-space: nowrap;
+    flex-shrink: 0;
+    padding: 0.7rem 1.2rem;
+}
+
+@media (max-width: 768px) {
+    .investment-edit {
+        max-width: 240px;
+    }
+    
+    .investment-edit .input-group .form-control {
+        max-width: 100px;
         padding: 0.6rem 1.2rem;
-        font-size: 0.9rem;
+    }
+    
+    .investment-edit .input-group .btn {
+        padding: 0.6rem 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .investment-edit {
+        max-width: 200px;
+    }
+    
+    .investment-edit .input-group .form-control {
+        max-width: 80px;
+        padding: 0.5rem 1rem;
+    }
+    
+    .investment-edit .input-group .btn {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.85rem;
     }
 } 

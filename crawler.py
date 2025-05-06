@@ -486,11 +486,11 @@ def get_total_balance():
     except Exception as e:
         print(f"获取余额失败: {str(e)}")
         return {
-            'buff_balance': 0.0,
-            'igxe_balance': 0.0,
-            'youpin_balance': 0.0,
-            'c5_balance': 0.0,
-            'total_balance': 0.0,
+            'buff_balance': None,
+            'igxe_balance': None,
+            'youpin_balance': None,
+            'c5_balance': None,
+            'total_balance': None,
             'timestamp': datetime.now().isoformat()
         }
     finally:
@@ -559,7 +559,7 @@ def get_c5_balance():
                     raise ValueError("API key不能为空")
         except Exception as e:
             print(f"读取C5 API key失败: {str(e)}")
-            return 0.0
+            return None
         
         # API配置
         BASE_URL = "http://openapi.c5game.com"
@@ -593,14 +593,14 @@ def get_c5_balance():
                 return balance
             else:
                 print(f"获取C5余额失败: {data.get('errorMsg')}")
-                return 0.0
+                return None
         else:
             print(f"获取C5余额失败: HTTP {response.status_code}")
-            return 0.0
+            return None
             
     except Exception as e:
         print(f"获取C5余额失败: {str(e)}")
-        return 0.0
+        return None
 
 def get_buff_balance(driver):
     """获取BUFF账户余额"""
@@ -618,31 +618,12 @@ def get_buff_balance(driver):
         balance_text = balance_element.text.replace('¥', '').strip()
         balance = float(balance_text)
         
-        # 保存余额数据
-        balance_data = {
-            'buff_balance': balance,
-            'timestamp': datetime.now().isoformat()
-        }
-        
-        # 确保data目录存在
-        os.makedirs('data', exist_ok=True)
-        
-        # 读取现有余额数据
-        if os.path.exists('data/balance.json'):
-            with open('data/balance.json', 'r', encoding='utf-8') as f:
-                existing_data = json.load(f)
-                balance_data.update(existing_data)
-        
-        # 保存更新后的余额数据
-        with open('data/balance.json', 'w', encoding='utf-8') as f:
-            json.dump(balance_data, f, ensure_ascii=False, indent=4)
-        
         print(f"成功获取BUFF余额：¥{balance:.2f}")
         return balance
         
     except Exception as e:
         print(f"获取BUFF余额失败：{str(e)}")
-        return 0.0
+        return None
 
 def get_youpin_balance(driver):
     """获取悠悠有品余额"""
@@ -663,7 +644,7 @@ def get_youpin_balance(driver):
         return balance
     except Exception as e:
         print(f"获取悠悠有品余额失败: {str(e)}")
-        return 0.0
+        return None
 
 def get_igxe_balance(driver):
     """获取IGXE账户余额"""
@@ -681,29 +662,9 @@ def get_igxe_balance(driver):
         balance_text = balance_element.text.replace('￥', '').strip()
         balance = float(balance_text)
         
-        # 准备余额数据
-        balance_data = {
-            'igxe_balance': balance,
-            'timestamp': datetime.now().isoformat()
-        }
-        
-        # 确保data目录存在
-        os.makedirs('data', exist_ok=True)
-        
-        # 读取现有余额数据
-        if os.path.exists('data/balance.json'):
-            with open('data/balance.json', 'r', encoding='utf-8') as f:
-                existing_data = json.load(f)
-                existing_data.update(balance_data)
-                balance_data = existing_data
-        
-        # 保存余额数据
-        with open('data/balance.json', 'w', encoding='utf-8') as f:
-            json.dump(balance_data, f, ensure_ascii=False, indent=4)
-        
         print(f"成功获取IGXE余额: {balance}")
         return balance
         
     except Exception as e:
         print(f"获取IGXE余额失败: {str(e)}")
-        return 0.0
+        return None  # 返回None而不是0，表示获取失败
