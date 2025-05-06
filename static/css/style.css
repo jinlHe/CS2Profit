@@ -1,0 +1,291 @@
+:root {
+    --apple-gray: #f5f5f7;
+    --apple-blue: #0071e3;
+    --apple-text: #1d1d1f;
+    --apple-text-secondary: #86868b;
+}
+
+body {
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: var(--apple-gray);
+    color: var(--apple-text);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+.container {
+    max-width: 1200px;
+    padding: 2rem;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    letter-spacing: -0.015em;
+}
+
+.card {
+    background: white;
+    border: none;
+    border-radius: 18px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.card-body {
+    padding: 1.5rem;
+    position: relative;
+    min-width: 0;
+}
+
+.card-title {
+    color: var(--apple-text-secondary);
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+}
+
+.card-body .d-flex.align-items-center {
+    position: relative;
+}
+
+.card-body .card-text {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--apple-text);
+    margin: 0;
+    padding-right: 0;
+    white-space: nowrap;
+    overflow: visible;
+    text-overflow: clip;
+}
+
+.card-body .btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    position: static;
+    transform: none;
+}
+
+.card-body .btn-sm.ms-2 {
+    margin-left: 0.5rem !important;
+}
+
+.position-relative {
+    min-width: 0;
+    width: 100%;
+}
+
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.btn {
+    border-radius: 980px;
+    padding: 0.5rem 1.2rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background-color: var(--apple-blue);
+    border-color: var(--apple-blue);
+}
+
+.btn-primary:hover {
+    background-color: #0077ed;
+    border-color: #0077ed;
+    transform: scale(1.02);
+}
+
+.btn-outline-primary {
+    color: var(--apple-blue);
+    border-color: var(--apple-blue);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--apple-blue);
+    color: white;
+}
+
+.table {
+    background: white;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.table thead th {
+    background-color: var(--apple-gray);
+    border-bottom: none;
+    color: var(--apple-text-secondary);
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    padding: 1rem;
+}
+
+.table tbody td {
+    padding: 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--apple-gray);
+}
+
+.sortable {
+    cursor: pointer;
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+.sortable:hover {
+    color: var(--apple-blue);
+}
+
+.sortable::after {
+    content: '↕';
+    position: absolute;
+    right: 8px;
+    color: var(--apple-text-secondary);
+    font-size: 0.8rem;
+}
+
+.sortable.asc::after {
+    content: '↑';
+}
+
+.sortable.desc::after {
+    content: '↓';
+}
+
+.edit-form {
+    margin-top: 1rem;
+    width: 100%;
+}
+
+.edit-form .input-group {
+    width: 100%;
+}
+
+.input-group {
+    border-radius: 980px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.input-group .btn {
+    position: static;
+    transform: none;
+}
+
+.form-control {
+    border-radius: 980px 0 0 980px;
+    border: 1px solid var(--apple-text-secondary);
+    padding: 0.5rem 1.2rem;
+}
+
+.form-control:focus {
+    box-shadow: none;
+    border-color: var(--apple-blue);
+}
+
+.refresh-balance {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+}
+
+.refresh-balance:hover {
+    transform: rotate(180deg);
+}
+
+.nav-tabs {
+    border: none;
+    margin-bottom: 2rem;
+}
+
+.nav-tabs .nav-link {
+    border: none;
+    color: var(--apple-text-secondary);
+    font-weight: 500;
+    padding: 1rem 2rem;
+    border-radius: 980px;
+    margin-right: 1rem;
+    transition: all 0.3s ease;
+}
+
+.nav-tabs .nav-link:hover {
+    color: var(--apple-blue);
+    background-color: rgba(0, 113, 227, 0.1);
+}
+
+.nav-tabs .nav-link.active {
+    color: white;
+    background-color: var(--apple-blue);
+}
+
+.tab-content {
+    animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.chart-container {
+    background: white;
+    border-radius: 18px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+/* 总余额卡片样式 */
+.card-body .gap-3 {
+    gap: 1rem !important;
+}
+
+.card-body .btn-sm {
+    position: static;
+    transform: none;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+
+    .card {
+        margin-bottom: 1rem;
+    }
+
+    .table-responsive {
+        border-radius: 18px;
+        overflow: hidden;
+    }
+
+    .card-body .d-flex.flex-wrap {
+        justify-content: flex-start !important;
+    }
+    
+    .card-body .gap-3 {
+        gap: 0.5rem !important;
+    }
+    
+    .card-body .d-flex.align-items-center {
+        margin-right: 1rem;
+        margin-bottom: 0.5rem;
+    }
+} 

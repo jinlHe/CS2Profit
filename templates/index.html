@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS2饰品分析</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="/static/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="mb-4 text-center">CS2饰品分析</h1>
+        
+        <!-- 统计卡片 -->
+        <div class="row mb-4 g-4">
+            <div class="col-md-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">总投入</h5>
+                        <div class="d-flex align-items-center">
+                            <p class="card-text mb-0" id="totalInvestment">¥0.00</p>
+                            <button class="btn btn-sm btn-outline-primary ms-2" onclick="toggleEdit('totalInvestment')">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                        </div>
+                        <div class="edit-form d-none mt-2" id="totalInvestmentEdit">
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="totalInvestmentInput" step="0.01">
+                                <button class="btn btn-primary" onclick="saveTotalInvestment()">保存</button>
+                                <button class="btn btn-secondary" onclick="cancelEdit('totalInvestment')">取消</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">库存价值</h5>
+                        <div class="d-flex align-items-center">
+                            <p class="card-text mb-0" id="currentValue">¥0.00</p>
+                            <button class="btn btn-sm btn-outline-primary ms-2" onclick="updateInventoryValue()">
+                                <i class="bi bi-arrow-clockwise"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">总价值</h5>
+                        <p class="card-text" id="totalValue">¥0.00</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">总利润</h5>
+                        <p class="card-text" id="totalProfit">¥0.00</p>
+                        <p class="text-muted small" id="profitRatio">利润率: 0.00%</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 总余额卡片 -->
+        <div class="row mb-4 g-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap">
+                            <div class="d-flex align-items-center mb-2 mb-md-0">
+                                <h5 class="card-title mb-0 me-3">总余额</h5>
+                                <div class="d-flex align-items-center">
+                                    <p class="card-text mb-0" id="totalBalance">¥0.00</p>
+                                    <button class="btn btn-sm btn-outline-primary ms-2" onclick="updateTotalBalance()">
+                                        <i class="bi bi-arrow-clockwise"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center flex-wrap gap-3">
+                                <div class="d-flex align-items-center">
+                                    <span class="text-muted me-2">BUFF:</span>
+                                    <span id="buffBalance" class="me-2">¥0.00</span>
+                                    <button class="btn btn-sm btn-outline-primary refresh-balance" data-platform="buff">
+                                        <i class="bi bi-arrow-clockwise"></i>
+                                    </button>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <span class="text-muted me-2">悠悠:</span>
+                                    <span id="youpinBalance" class="me-2">¥0.00</span>
+                                    <button class="btn btn-sm btn-outline-primary refresh-balance" data-platform="youpin">
+                                        <i class="bi bi-arrow-clockwise"></i>
+                                    </button>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <span class="text-muted me-2">IGXE:</span>
+                                    <span id="igxeBalance" class="me-2">¥0.00</span>
+                                    <button class="btn btn-sm btn-outline-primary refresh-balance" data-platform="igxe">
+                                        <i class="bi bi-arrow-clockwise"></i>
+                                    </button>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <span class="text-muted me-2">C5:</span>
+                                    <span id="c5Balance" class="me-2">¥0.00</span>
+                                    <button class="btn btn-sm btn-outline-primary refresh-balance" data-platform="c5">
+                                        <i class="bi bi-arrow-clockwise"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 交易统计 -->
+        <div class="row mb-4 g-4">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">总买入</h5>
+                        <p class="card-text" id="buffTotalBuy">¥0.00</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">总卖出</h5>
+                        <p class="card-text" id="buffTotalSale">¥0.00</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">净收益</h5>
+                        <p class="card-text" id="buffNetProfit">¥0.00</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 标签页导航 -->
+        <ul class="nav nav-tabs" id="tradeTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="holdings-tab" data-bs-toggle="tab" data-bs-target="#holdings" type="button" role="tab" aria-controls="holdings" aria-selected="true">持有记录</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="completed-tab" data-bs-toggle="tab" data-bs-target="#completed" type="button" role="tab" aria-controls="completed" aria-selected="false">成交记录</button>
+            </li>
+        </ul>
+
+        <!-- 标签页内容 -->
+        <div class="tab-content" id="tradeTabsContent">
+            <!-- 持有记录 -->
+            <div class="tab-pane fade show active" id="holdings" role="tabpanel" aria-labelledby="holdings-tab">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th class="sortable" data-sort="item_name">饰品名称</th>
+                                <th class="sortable" data-sort="quantity">数量</th>
+                                <th class="sortable" data-sort="unit_price">单价</th>
+                                <th class="sortable" data-sort="total_price">总价</th>
+                                <th class="sortable" data-sort="purchase_date">买入日期</th>
+                                <th class="sortable" data-sort="platform">平台</th>
+                            </tr>
+                        </thead>
+                        <tbody id="holdingsTableBody">
+                            <!-- 持有记录将通过JavaScript动态填充 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 成交记录 -->
+            <div class="tab-pane fade" id="completed" role="tabpanel" aria-labelledby="completed-tab">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th class="sortable" data-sort="item_name">饰品名称</th>
+                                <th class="sortable" data-sort="quantity">数量</th>
+                                <th class="sortable" data-sort="unit_price">买入单价</th>
+                                <th class="sortable" data-sort="total_price">买入总价</th>
+                                <th class="sortable" data-sort="sale_price">卖出总价</th>
+                                <th class="sortable" data-sort="profit">利润</th>
+                                <th class="sortable" data-sort="purchase_date">买入日期</th>
+                                <th class="sortable" data-sort="sale_date">卖出日期</th>
+                                <th class="sortable" data-sort="platform">平台</th>
+                            </tr>
+                        </thead>
+                        <tbody id="completedTableBody">
+                            <!-- 成交记录将通过JavaScript动态填充 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html> 
