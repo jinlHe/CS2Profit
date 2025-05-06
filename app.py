@@ -263,6 +263,25 @@ def update_balance():
             with open('data/balance.json', 'r') as f:
                 balance_data = json.load(f)
         
+        # C5使用API获取余额，不需要浏览器
+        if platform in ['c5', 'all']:
+            print("正在更新C5余额...")
+            c5_balance = get_c5_balance()  # 直接调用API函数
+            balance_data['c5_balance'] = c5_balance
+            print(f"C5余额更新成功: {c5_balance}")
+            
+            # 如果只更新C5余额，直接返回结果
+            if platform == 'c5':
+                # 更新总余额
+                balance_data['total_balance'] = balance_data.get('buff_balance', 0.0) + balance_data.get('youpin_balance', 0.0) + balance_data.get('igxe_balance', 0.0) + c5_balance
+                
+                # 保存更新后的余额数据
+                with open('data/balance.json', 'w') as f:
+                    json.dump(balance_data, f)
+                    
+                return jsonify(balance_data)
+        
+        # 其他平台仍然使用浏览器获取
         # 初始化Chrome浏览器
         driver = get_chrome_driver()
         
@@ -282,7 +301,6 @@ def update_balance():
                 buff_balance = get_buff_balance(driver)
                 balance_data['buff_balance'] = buff_balance
                 print(f"BUFF余额更新成功: {buff_balance}")
-                
 
             if platform in ['igxe', 'all']:
                 print("正在更新IGXE余额...")
@@ -299,7 +317,6 @@ def update_balance():
                 igxe_balance = get_igxe_balance(driver)
                 balance_data['igxe_balance'] = igxe_balance
                 print(f"IGXE余额更新成功: {igxe_balance}")
-                
 
             if platform in ['youpin', 'all']:
                 print("正在更新悠悠有品余额...")
@@ -316,27 +333,6 @@ def update_balance():
                 youpin_balance = get_youpin_balance(driver)
                 balance_data['youpin_balance'] = youpin_balance
                 print(f"悠悠有品余额更新成功: {youpin_balance}")
-                
-
-            if platform in ['c5', 'all']:
-                print("正在更新C5余额...")
-                # 先访问C5域名
-                driver.get("https://www.c5game.com/csgo")
-                time.sleep(2)  # 等待页面加载
-                
-                # 加载C5 cookies
-                if os.path.exists('data/cookie/c5_cookies.json'):
-                    with open('data/cookie/c5_cookies.json', 'r') as f:
-                        cookies = json.load(f)
-                        # 解析cookie字符串
-                    for cookie in cookies:
-                        driver.add_cookie(cookie)
-            
-                
-                # 获取C5余额
-                c5_balance = get_c5_balance(driver)
-                balance_data['c5_balance'] = c5_balance
-                print(f"C5余额更新成功: {c5_balance}")
 
             # 更新总余额
             balance_data['total_balance'] = balance_data.get('buff_balance', 0.0) + balance_data.get('youpin_balance', 0.0) + balance_data.get('igxe_balance', 0.0) + balance_data.get('c5_balance', 0.0)

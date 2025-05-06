@@ -14,6 +14,7 @@ import re
 import csv
 import json
 import sys
+import requests
 
 def get_chrome_driver():
     """获取配置好的Chrome浏览器实例"""
@@ -461,7 +462,7 @@ def get_total_balance():
                     driver.add_cookie(cookie)
             driver.refresh()
             time.sleep(1)
-        c5_balance = get_c5_balance(driver)
+        c5_balance = get_c5_balance()
         
         # 计算总余额
         total_balance = buff_balance + igxe_balance + youpin_balance + c5_balance
@@ -546,65 +547,55 @@ def save_youpin_cookies():
         if driver:
             driver.quit() 
 
-def save_c5_cookies(cookie_str=None):
-    """保存C5的cookies
-    
-    Args:
-        cookie_str (str, optional): 手动提供的cookie字符串。如果提供，将直接保存该字符串。
-    """
+def get_c5_balance():
+    """获取C5账户余额（使用API）"""
     try:
-        if cookie_str:
-            # 如果提供了cookie字符串，直接保存
-            os.makedirs('data', exist_ok=True)
-            with open('data/cookie/c5_cookies.json', 'w') as f:
-                json.dump(cookie_str, f)
-            print("C5 cookies保存成功")
-            return True
+        # 读取API key
+        try:
+            with open('data/cookie/c5_api_key.json', 'r') as f:
+                api_config = json.load(f)
+                APP_KEY = api_config.get('app_key')
+                if not APP_KEY:
+                    raise ValueError("API key不能为空")
+        except Exception as e:
+            print(f"读取C5 API key失败: {str(e)}")
+            return 0.0
+        
+        # API配置
+        BASE_URL = "http://openapi.c5game.com"
+        
+        # 构建请求URL和头部
+        endpoint = "/merchant/account/v1/balance"
+        url = f"{BASE_URL}{endpoint}"
+        
+        # 设置请求参数和头部
+        params = {
+            "app-key": APP_KEY,
+            "accountType": 0  # 0-账户余额
+        }
+        
+        headers = {
+            "app-key": APP_KEY
+        }
+        
+        # 发送请求
+        response = requests.get(url, params=params, headers=headers)
+        
+        # 检查响应状态码
+        if response.status_code == 200:
+            data = response.json()
             
-        # 如果没有提供cookie字符串，则使用浏览器方式获取
-        driver = get_chrome_driver()
-        driver.get("https://www.c5game.com/csgo")
-        time.sleep(2)
-        
-        # 等待用户手动登录
-        input("请在浏览器中登录C5，登录完成后按回车继续...")
-        
-        # 获取cookies
-        cookies = driver.get_cookies()
-        
-        # 保存cookies到文件
-        os.makedirs('data', exist_ok=True)
-        with open('data/cookie/c5_cookies.json', 'w') as f:
-            json.dump(cookies, f)
-            
-        print("C5 cookies保存成功")
-        return True
-    except Exception as e:
-        print(f"保存C5 cookies失败: {str(e)}")
-        return False
-    finally:
-        if 'driver' in locals():
-            driver.quit() 
-
-def get_c5_balance(driver):
-    """获取C5账户余额"""
-    try:
-        # 先访问C5域名
-        driver.get("https://www.c5game.com/user/user")
-        time.sleep(2)  # 等待页面加载
-        
-        # 查找余额元素
-        balance_element = driver.find_element(By.CSS_SELECTOR, "div.price[data-v-70694271]")
-        if balance_element:
-            # 获取余额文本
-            balance_text = balance_element.text
-            # 提取数字部分
-            balance_text = balance_text.replace('元', '').strip()
-            balance = float(balance_text.replace('¥', '').strip())
-            print(f"成功获取C5余额: {balance}")
-            return balance
+            # 检查API响应是否成功
+            if data.get("success"):
+                balance_info = data.get("data", {})
+                balance = balance_info.get("balance", 0.0)
+                print(f"成功获取C5余额: {balance}")
+                return balance
+            else:
+                print(f"获取C5余额失败: {data.get('errorMsg')}")
+                return 0.0
         else:
-            print("未找到C5余额元素")
+            print(f"获取C5余额失败: HTTP {response.status_code}")
             return 0.0
             
     except Exception as e:
