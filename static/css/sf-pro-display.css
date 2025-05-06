@@ -1,3 +1,11 @@
+/* Inter font from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* Replace SF Pro Display with Inter */
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
 @font-face {
     font-family: 'SF Pro Display';
     src: url('../fonts/SF-Pro-Display-Regular.woff2') format('woff2');

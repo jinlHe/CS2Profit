@@ -74,9 +74,10 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center flex-wrap">
-                            <div class="d-flex align-items-center mb-3 mb-md-0">
-                                <h5 class="card-title mb-0 me-3">总余额</h5>
+                        <div class="d-flex align-items-center">
+                            <!-- 总余额部分 -->
+                            <div class="d-flex flex-column align-items-center me-5">
+                                <h5 class="card-title mb-2">总余额</h5>
                                 <div class="d-flex align-items-center">
                                     <p class="card-text mb-0" id="totalBalance">¥0.00</p>
                                     <button class="btn btn-sm btn-outline-primary ms-2" onclick="updateTotalBalance()">
@@ -84,34 +85,43 @@
                                     </button>
                                 </div>
                             </div>
-                            <div class="d-flex align-items-center flex-wrap gap-3">
-                                <div class="d-flex align-items-center">
-                                    <span class="text-muted me-2">BUFF:</span>
-                                    <span id="buffBalance" class="me-2">¥0.00</span>
-                                    <button class="btn btn-sm btn-outline-primary refresh-balance" data-platform="buff">
-                                        <i class="bi bi-arrow-clockwise"></i>
-                                    </button>
+                            <!-- 平台余额部分 -->
+                            <div class="d-flex align-items-center gap-4">
+                                <div class="d-flex flex-column align-items-center">
+                                    <span class="text-muted mb-2">BUFF</span>
+                                    <div class="d-flex align-items-center">
+                                        <span id="buffBalance" class="me-2">¥0.00</span>
+                                        <button class="btn btn-sm btn-outline-primary refresh-balance" data-platform="buff">
+                                            <i class="bi bi-arrow-clockwise"></i>
+                                        </button>
+                                    </div>
                                 </div>
-                                <div class="d-flex align-items-center">
-                                    <span class="text-muted me-2">悠悠:</span>
-                                    <span id="youpinBalance" class="me-2">¥0.00</span>
-                                    <button class="btn btn-sm btn-outline-primary refresh-balance" data-platform="youpin">
-                                        <i class="bi bi-arrow-clockwise"></i>
-                                    </button>
+                                <div class="d-flex flex-column align-items-center">
+                                    <span class="text-muted mb-2">悠悠</span>
+                                    <div class="d-flex align-items-center">
+                                        <span id="youpinBalance" class="me-2">¥0.00</span>
+                                        <button class="btn btn-sm btn-outline-primary refresh-balance" data-platform="youpin">
+                                            <i class="bi bi-arrow-clockwise"></i>
+                                        </button>
+                                    </div>
                                 </div>
-                                <div class="d-flex align-items-center">
-                                    <span class="text-muted me-2">IGXE:</span>
-                                    <span id="igxeBalance" class="me-2">¥0.00</span>
-                                    <button class="btn btn-sm btn-outline-primary refresh-balance" data-platform="igxe">
-                                        <i class="bi bi-arrow-clockwise"></i>
-                                    </button>
+                                <div class="d-flex flex-column align-items-center">
+                                    <span class="text-muted mb-2">IGXE</span>
+                                    <div class="d-flex align-items-center">
+                                        <span id="igxeBalance" class="me-2">¥0.00</span>
+                                        <button class="btn btn-sm btn-outline-primary refresh-balance" data-platform="igxe">
+                                            <i class="bi bi-arrow-clockwise"></i>
+                                        </button>
+                                    </div>
                                 </div>
-                                <div class="d-flex align-items-center">
-                                    <span class="text-muted me-2">C5:</span>
-                                    <span id="c5Balance" class="me-2">¥0.00</span>
-                                    <button class="btn btn-sm btn-outline-primary refresh-balance" data-platform="c5">
-                                        <i class="bi bi-arrow-clockwise"></i>
-                                    </button>
+                                <div class="d-flex flex-column align-items-center">
+                                    <span class="text-muted mb-2">C5</span>
+                                    <div class="d-flex align-items-center">
+                                        <span id="c5Balance" class="me-2">¥0.00</span>
+                                        <button class="btn btn-sm btn-outline-primary refresh-balance" data-platform="c5">
+                                            <i class="bi bi-arrow-clockwise"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -207,7 +217,7 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
     <script src="/static/js/app.js"></script>
 </body>
 </html> 
