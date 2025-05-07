@@ -53,7 +53,7 @@
 2. 安装步骤：
    ```bash
    # 克隆项目
-   git clone https://github.com/yourusername/CS2Profit.git
+   git clone https://github.com/jinlHe/CS2Profit.git
    cd CS2Profit
 
    # 安装依赖
