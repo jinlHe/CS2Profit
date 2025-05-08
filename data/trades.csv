@@ -1,1 +1,1 @@
-item_name,quantity,unit_price,total_price,break_even_price,profit_price,target_price,current_price,net_profit,profit_ratio,purchase_date,sale_date,sale_price,sale_income,sale_profit_ratio
+item_name,quantity,unit_price,total_price,purchase_date,sale_date,sale_price
