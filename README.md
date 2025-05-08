@@ -95,6 +95,13 @@
 4. 点击"导出记录"按钮下载CSV文件
 5. 将下载的两个CSV文件放入`data/buff/`目录中
 
+#### 悠悠平台交易记录导入
+1. 打开手机悠悠购买记录和出售记录，都选择已完成的订单分类
+2. 手机长截图，如果很多可以截图成很多张，截图放到data/youyou下
+3. 使用data/data_extract/ocr_long_image.py进行ocr识别
+4. 使用data/data_extract/process_ocr_data.py进行数据识别
+5. 识别出的csv文件放到youyou目录下，名称记得一定要包含sale或者buy关键字，否则识别不到
+
 ### 3. 启动应用
 ```bash
 python app.py
