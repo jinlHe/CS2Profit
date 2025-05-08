@@ -45,83 +45,169 @@ def get_data():
         
         # 加载交易记录
         trades = []
-        for platform in ['buff', 'youpin', 'igxe', 'c5']:
+        
+        # 平台名称映射
+        platform_display_names = {
+            'buff': 'BUFF',
+            'youyou': '悠悠',
+            'igxe': 'IGXE',
+            'c5': 'C5'
+        }
+        
+        # 处理所有平台的交易记录
+        for platform in ['buff', 'youyou', 'igxe', 'c5']:
             platform_dir = os.path.join('data', platform)
+            print(f"\n检查平台目录: {platform_dir}")
+            
             if os.path.exists(platform_dir):
+                print(f"找到{platform}平台目录")
                 for filename in os.listdir(platform_dir):
-                    if filename.endswith('_buy.csv'):
-                        file_path = os.path.join(platform_dir, filename)
+                    print(f"\n处理文件: {filename}")
+                    
+                    # 检查是否是CSV文件
+                    if not filename.endswith('.csv'):
+                        print(f"跳过非CSV文件: {filename}")
+                        continue
+                        
+                    # 判断是买入还是卖出记录
+                    is_buy = 'buy' in filename.lower()
+                    is_sale = 'sale' in filename.lower()
+                    
+                    if not (is_buy or is_sale):
+                        print(f"文件名中未找到buy或sale标记: {filename}")
+                        continue
+                    
+                    print(f"文件类型: {'买入' if is_buy else '卖出'}")
+                    
+                    file_path = os.path.join(platform_dir, filename)
+                    try:
                         with open(file_path, 'r', encoding='utf-8') as f:
                             reader = csv.DictReader(f)
+                            print(f"CSV列名: {reader.fieldnames}")
+                            
+                            row_count = 0
                             for row in reader:
-                                # 提取饰品名称和URL
-                                item_info = row['饰品']
-                                item_name = item_info
-                                item_url = None
+                                row_count += 1
+                                print(f"\n处理第 {row_count} 行数据:")
+                                print(f"原始数据: {row}")
                                 
-                                # 处理BUFF的HYPERLINK格式
-                                if '=HYPERLINK(' in item_info:
+                                # 根据不同平台处理数据
+                                if platform == 'buff':
+                                    # BUFF特有的HYPERLINK格式处理
+                                    item_info = row.get('饰品', '')
+                                    item_name = item_info
+                                    item_url = None
+                                    
+                                    if '=HYPERLINK(' in item_info:
+                                        try:
+                                            url_start = item_info.find('"', item_info.find('=HYPERLINK(')) + 1
+                                            url_end = item_info.find('"', url_start)
+                                            name_start = item_info.find('"', url_end + 1) + 1
+                                            name_end = item_info.find('"', name_start)
+                                            
+                                            item_url = item_info[url_start:url_end]
+                                            item_name = item_info[name_start:name_end]
+                                        except:
+                                            pass
+                                    
+                                    # 处理价格
+                                    price_str = row.get('价格', '0')
+                                    if isinstance(price_str, str):
+                                        price_str = price_str.replace('¥', '').replace('￥', '').strip()
                                     try:
-                                        # 提取URL和名称
-                                        url_start = item_info.find('"', item_info.find('=HYPERLINK(')) + 1
-                                        url_end = item_info.find('"', url_start)
-                                        name_start = item_info.find('"', url_end + 1) + 1
-                                        name_end = item_info.find('"', name_start)
-                                        
-                                        item_url = item_info[url_start:url_end]
-                                        item_name = item_info[name_start:name_end]
-                                    except:
-                                        pass
+                                        price = float(price_str)
+                                    except ValueError:
+                                        print(f"警告：无效的价格格式 {price_str}，跳过该记录")
+                                        continue
+                                    
+                                    # 处理时间
+                                    time_str = row.get('时间', '')
+                                    
+                                elif platform == 'youyou':
+                                    # 悠悠有品的数据处理
+                                    item_name = row.get('\ufeff饰品', '').strip()
+                                    if not item_name:
+                                        print(f"警告：发现空的商品名称，跳过该记录")
+                                        continue
+                                    
+                                    # 处理价格
+                                    price_str = row.get('价格', '0')
+                                    try:
+                                        price = float(price_str)
+                                    except ValueError:
+                                        print(f"警告：无效的价格格式 {price_str}，跳过该记录")
+                                        continue
+                                    
+                                    # 处理时间
+                                    time_str = row.get('时间', '')
+                                    item_url = None
+
+                                    
+                                else:
+                                    # 其他平台的数据格式
+                                    item_name = row.get('name', '')
+                                    price_str = row.get('price', '0')
+                                    if isinstance(price_str, str):
+                                        price_str = price_str.replace('¥', '').replace('￥', '').strip()
+                                    try:
+                                        price = float(price_str)
+                                    except ValueError:
+                                        print(f"警告：无效的价格格式 {price_str}，跳过该记录")
+                                        continue
+                                    time_str = row.get('time', '')
                                 
+                                print(f"处理后的物品名称: {item_name}")
+                                print(f"处理后的价格: {price}")
+                                print(f"处理后的时间: {time_str}")
+                                
+                                # 创建交易记录
                                 trade = {
                                     'item_name': item_name,
                                     'item_url': item_url,
                                     'quantity': 1,
-                                    'unit_price': float(row['价格'].replace('¥', '').strip()),
-                                    'total_price': float(row['价格'].replace('¥', '').strip()),
-                                    'purchase_date': row['时间'],
-                                    'platform': platform.upper()
+                                    'unit_price': price,
+                                    'total_price': price,
+                                    'platform': platform_display_names[platform]
                                 }
-                                trades.append(trade)
-                    elif filename.endswith('_sale.csv'):
-                        file_path = os.path.join(platform_dir, filename)
-                        with open(file_path, 'r', encoding='utf-8') as f:
-                            reader = csv.DictReader(f)
-                            for row in reader:
-                                # 提取饰品名称和URL
-                                item_info = row['饰品']
-                                item_name = item_info
-                                item_url = None
                                 
-                                # 处理BUFF的HYPERLINK格式
-                                if '=HYPERLINK(' in item_info:
-                                    try:
-                                        # 提取URL和名称
-                                        url_start = item_info.find('"', item_info.find('=HYPERLINK(')) + 1
-                                        url_end = item_info.find('"', url_start)
-                                        name_start = item_info.find('"', url_end + 1) + 1
-                                        name_end = item_info.find('"', name_start)
-                                        
-                                        item_url = item_info[url_start:url_end]
-                                        item_name = item_info[name_start:name_end]
-                                    except:
-                                        pass
+                                # 根据记录类型添加不同的字段
+                                if is_buy:
+                                    trade['purchase_date'] = time_str
+                                    print(f"创建的买入交易记录: {trade}")
+                                elif is_sale:
+                                    trade['sale_date'] = time_str
+                                    trade['sale_price'] = price
+                                    print(f"创建的卖出交易记录: {trade}")
                                 
-                                trade = {
-                                    'item_name': item_name,
-                                    'item_url': item_url,
-                                    'quantity': 1,
-                                    'unit_price': float(row['价格'].replace('¥', '').strip()),
-                                    'total_price': float(row['价格'].replace('¥', '').strip()),
-                                    'sale_price': float(row['价格'].replace('¥', '').strip()),
-                                    'sale_date': row['时间'],
-                                    'platform': platform.upper()
-                                }
+                                
                                 trades.append(trade)
+                                
+                            print(f"\n文件 {filename} 处理完成，共处理 {row_count} 行数据")
+                                
+                    except Exception as e:
+                        print(f"处理{platform}平台{filename}文件时出错: {str(e)}")
+                        print(f"错误详情: ", e.__class__.__name__)
+                        import traceback
+                        print(traceback.format_exc())
+                        continue
+            else:
+                print(f"未找到{platform}平台目录")
+        
+        print(f"\n=== 所有平台数据加载完成 ===")
+        print(f"总共加载了 {len(trades)} 条交易记录")
         
         # 合并所有交易记录
         all_trades = trades
         print(f"合并前总交易记录数：{len(all_trades)}条")
+        
+        # 按平台统计记录数
+        platform_counts = {}
+        for trade in all_trades:
+            platform = trade['platform']
+            platform_counts[platform] = platform_counts.get(platform, 0) + 1
+        print("各平台记录数:")
+        for platform, count in platform_counts.items():
+            print(f"{platform}: {count}条")
         
         # 合并相同商品的交易记录
         merged_trades = merge_trades(all_trades)
@@ -138,12 +224,22 @@ def get_data():
                     print(f"跳过不完整的交易记录：{trade}")
                     continue
                 
-                if trade.get('purchase_date') and not trade.get('sale_date'):
-                    # 只有买入日期，没有卖出日期的商品加入持有列表
-                    holdings.append(trade)
-                elif trade.get('purchase_date') and trade.get('sale_date'):
-                    # 既有买入日期，又有卖出日期的商品加入成交记录列表
+                if 'purchase_date' in trade and 'sale_date' in trade:
+                    # 既有买入日期又有卖出日期的记录加入成交记录
+                    print(f"添加到成交记录: {trade}")
                     completed_trades.append(trade)
+                elif 'purchase_date' in trade:
+                    # 只有买入日期的记录加入持有记录
+                    print(f"添加到持有记录: {trade}")
+                    holdings.append(trade)
+                elif 'sale_date' in trade:
+                    # 只有卖出日期的记录也加入成交记录
+                    print(f"添加到成交记录（仅卖出）: {trade}")
+                    # 设置purchase_date为None，以便前端可以区分处理
+                    trade['purchase_date'] = None
+                    completed_trades.append(trade)
+                else:
+                    print(f"未知类型的记录: {trade}")
             except Exception as e:
                 print(f"处理交易记录时出错：{str(e)}")
                 continue
@@ -437,49 +533,214 @@ def update_balance():
         print(f"更新余额失败: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
+def standardize_date(date_str):
+    """
+    统一日期格式为 YYYY-MM-DD HH:MM:SS
+    """
+    try:
+        # 处理悠悠有品格式 (2025.02.2114:02:00)
+        if '.' in date_str and len(date_str) == 19:
+            date_obj = datetime.strptime(date_str, '%Y.%m.%d%H:%M:%S')
+            return date_obj.strftime('%Y-%m-%d %H:%M:%S')
+        # 处理BUFF格式 (已经是标准格式)
+        else:
+            return date_str
+    except Exception as e:
+        print(f"日期格式转换失败: {date_str}, 错误: {str(e)}")
+        return date_str
+
+def get_wear_level(name):
+    """
+    从商品名称中提取磨损等级
+    返回: (磨损等级, 剩余名称)
+    """
+    wear_levels = {
+        '崭新出厂': ['崭新出厂', '崭新'],
+        '略有磨损': ['略有磨损', '略磨'],
+        '久经沙场': ['久经沙场', '久经'],
+        '破损不堪': ['破损不堪', '破损'],
+        '战痕累累': ['战痕累累', '战痕']
+    }
+    
+    # 检查是否是探员或特殊角色
+    agent_features = [
+        '专业人士', '游击队', '海豹部队', '军刀', 'FBI特工',
+        '上校', '中队长', '海军上尉', '指挥官', '特种部队',
+        '达里尔爵士'
+    ]
+    
+    # 检查是否是特殊物品
+    special_items = ['印花', '音乐盒', '挂件', '胸章']
+    
+    # 如果是探员或特殊物品，直接返回None和原始名称
+    if any(agent in name for agent in agent_features) or any(item in name for item in special_items):
+        return None, name
+    
+    # 检查磨损等级
+    for level, keywords in wear_levels.items():
+        for keyword in keywords:
+            if keyword in name:
+                # 移除磨损等级和括号
+                remaining = name.replace(keyword, '').replace('(', '').replace(')', '').replace('（', '').replace('）', '')
+                return level, remaining.strip()
+    
+    return None, name
+
+def calculate_similarity(str1, str2):
+    """
+    计算两个字符串的相似度
+    使用简单的字符匹配算法
+    """
+    if not str1 or not str2:
+        return 0
+    
+    # 将字符串转换为字符集合
+    set1 = set(str1)
+    set2 = set(str2)
+    
+    # 计算交集和并集
+    intersection = len(set1.intersection(set2))
+    union = len(set1.union(set2))
+    
+    # 计算相似度
+    return intersection / union if union > 0 else 0
+
+def standardize_item_name(name):
+    """
+    标准化商品名称，移除特殊字符和多余空格
+    """
+    if not name:
+        return ""
+    
+    # 移除特殊字符，只保留中文、英文和数字
+    name = ''.join(char for char in name if '\u4e00' <= char <= '\u9fff' or char.isalnum())
+    
+    # 移除多余的空格
+    name = ' '.join(name.split())
+    
+    return name
+
 def merge_trades(trades):
-    """合并相同商品的交易记录"""
-    merged_trades = {}
+    """
+    合并交易记录，按照商品名称进行合并，支持跨平台交易
+    """
+    merged = {}
+    print("\n=== 开始合并交易记录 ===")
     
     for trade in trades:
-        item_name = trade['item_name']
-        if item_name not in merged_trades:
-            merged_trades[item_name] = {
-                'item_name': item_name,
-                'item_url': trade.get('item_url'),
-                'quantity': 0,
-                'unit_price': 0,
-                'total_price': 0,
-                'purchase_date': None,
-                'sale_date': None,
-                'sale_price': 0,
-                'platform': trade['platform']
-            }
+        # 确保必要字段存在
+        if not all(key in trade for key in ['item_name', 'platform', 'unit_price']):
+            print(f"跳过不完整的交易记录: {trade}")
+            continue
+            
+        # 获取磨损等级和剩余名称
+        wear_level, remaining_name = get_wear_level(trade['item_name'])
+        standardized_name = standardize_item_name(remaining_name)
         
-        merged = merged_trades[item_name]
+        print(f"\n处理商品: {trade['item_name']}")
+        print(f"磨损等级: {wear_level}")
+        print(f"标准化名称: {standardized_name}")
         
-        # 更新数量和总价
-        merged['quantity'] += trade.get('quantity', 1)
-        merged['total_price'] += trade.get('total_price', 0)
+        # 标准化日期格式
+        if 'purchase_date' in trade:
+            trade['purchase_date'] = standardize_date(trade['purchase_date'])
+        if 'sale_date' in trade:
+            trade['sale_date'] = standardize_date(trade['sale_date'])
         
-        # 更新买入日期
-        if trade.get('purchase_date'):
-            if not merged['purchase_date'] or trade['purchase_date'] < merged['purchase_date']:
-                merged['purchase_date'] = trade['purchase_date']
-                merged['unit_price'] = trade.get('unit_price', 0)
+        # 查找匹配的记录
+        matched_key = None
+        for key in merged.keys():
+            existing_wear_level, existing_remaining = get_wear_level(key)
+            existing_standardized = standardize_item_name(existing_remaining)
+            
+            # 检查磨损等级是否匹配
+            wear_match = True  # 默认匹配
+            if wear_level is not None and existing_wear_level is not None:
+                # 只有当两个记录都有磨损等级时才进行匹配
+                wear_match = (wear_level == existing_wear_level) or \
+                           any(w in wear_level for w in existing_wear_level.split()) or \
+                           any(w in existing_wear_level for w in wear_level.split())
+            
+            # 检查名称相似度
+            name_similarity = calculate_similarity(standardized_name, existing_standardized)
+            
+            if wear_match and name_similarity >= 0.6:
+                matched_key = key
+                print(f"找到匹配记录: {key}")
+                print(f"磨损等级匹配: {wear_match}")
+                print(f"名称相似度: {name_similarity}")
+                break
         
-        # 更新卖出日期和价格
-        if trade.get('sale_date'):
-            if not merged['sale_date'] or trade['sale_date'] > merged['sale_date']:
-                merged['sale_date'] = trade['sale_date']
-                merged['sale_price'] = trade.get('sale_price', 0)
+        if matched_key is None:
+            # 如果是新商品，直接添加
+            merged[trade['item_name']] = trade.copy()
+            merged[trade['item_name']]['quantity'] = 1
+            merged[trade['item_name']]['total_price'] = trade['unit_price']
+            merged[trade['item_name']]['platforms'] = {trade['platform']}
+            print(f"新增商品记录: {merged[trade['item_name']]}")
+        else:
+            # 如果已存在，更新记录
+            existing = merged[matched_key]
+            print(f"已存在的记录: {existing}")
+            
+            # 如果当前记录是卖出记录
+            if 'sale_date' in trade:
+                print("处理卖出记录")
+                if 'sale_date' not in existing:
+                    existing['sale_date'] = trade['sale_date']
+                    existing['sale_price'] = trade['unit_price']
+                    existing['platforms'].add(trade['platform'])
+                    print(f"添加卖出信息: {existing}")
+                else:
+                    # 如果已有卖出记录，保留价格较高的记录
+                    if trade['unit_price'] > existing['sale_price']:
+                        existing['sale_date'] = trade['sale_date']
+                        existing['sale_price'] = trade['unit_price']
+                        existing['platforms'].add(trade['platform'])
+                        print(f"更新为更高的卖出价格: {existing}")
+            
+            # 如果当前记录是买入记录
+            if 'purchase_date' in trade:
+                print("处理买入记录")
+                if 'purchase_date' not in existing:
+                    existing['purchase_date'] = trade['purchase_date']
+                    existing['unit_price'] = trade['unit_price']
+                    existing['total_price'] = trade['total_price']
+                    existing['platforms'].add(trade['platform'])
+                    print(f"添加买入信息: {existing}")
+                else:
+                    # 如果已有买入记录，保留价格较低的记录
+                    if trade['unit_price'] < existing['unit_price']:
+                        existing['purchase_date'] = trade['purchase_date']
+                        existing['unit_price'] = trade['unit_price']
+                        existing['total_price'] = trade['total_price']
+                        existing['platforms'].add(trade['platform'])
+                        print(f"更新为更低的买入价格: {existing}")
     
-    # 计算平均单价
-    for trade in merged_trades.values():
-        if trade['quantity'] > 0 and trade['total_price'] > 0:
-            trade['unit_price'] = trade['total_price'] / trade['quantity']
+    # 转换回列表，并处理平台显示
+    result = []
+    print("\n=== 处理最终结果 ===")
+    for key, trade in merged.items():
+        # 将平台集合转换为排序后的字符串
+        platforms = sorted(list(trade['platforms']))
+        trade['platform'] = '/'.join(platforms)
+        trade.pop('platforms', None)
+        
+        # 检查是否是完整的交易记录（同时有买入和卖出）
+        if 'purchase_date' in trade and 'sale_date' in trade:
+            print(f"找到完整的交易记录: {trade}")
+            # 计算利润
+            trade['profit'] = trade['sale_price'] - trade['unit_price']
+            trade['profit_ratio'] = (trade['profit'] / trade['unit_price'] * 100) if trade['unit_price'] > 0 else 0
+        elif 'purchase_date' in trade:
+            print(f"找到仅买入记录: {trade}")
+        elif 'sale_date' in trade:
+            print(f"找到仅卖出记录: {trade}")
+            
+        result.append(trade)
     
-    return list(merged_trades.values())
+    print(f"\n合并后的记录总数: {len(result)}")
+    return result
 
 if __name__ == '__main__':
     app.run(debug=True) 
