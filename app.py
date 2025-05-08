@@ -6,6 +6,9 @@ import json
 import time
 from datetime import datetime
 import csv
+import pandas as pd
+from collections import defaultdict
+from c5_inventory import update_inventory
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///trades.db'
@@ -36,6 +39,8 @@ def save_custom_total_investment(value):
 
 @app.route('/')
 def index():
+    # 更新Steam库存数据
+    update_inventory()
     return render_template('index.html')
 
 @app.route('/api/data')
@@ -741,6 +746,39 @@ def merge_trades(trades):
     
     print(f"\n合并后的记录总数: {len(result)}")
     return result
+
+@app.route('/api/steam_inventory')
+def get_steam_inventory():
+    """获取Steam库存数据"""
+    try:
+        # 读取CSV文件
+        df = pd.read_csv('data/steaminventory.csv')
+        
+        # 使用defaultdict来统计每个物品的数量
+        inventory_count = defaultdict(int)
+        
+        # 遍历每一行，统计相同物品的数量
+        for _, row in df.iterrows():
+            item_name = row['name']
+            inventory_count[item_name] += 1
+        
+        # 转换为列表格式
+        inventory_list = [
+            {
+                'item_name': item_name,
+                'quantity': count
+            }
+            for item_name, count in inventory_count.items()
+        ]
+        
+        # 按物品名称排序
+        inventory_list.sort(key=lambda x: x['item_name'])
+        
+        return jsonify(inventory_list)
+        
+    except Exception as e:
+        print(f"获取Steam库存数据失败：{str(e)}")
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True) 

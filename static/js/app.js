@@ -16,6 +16,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // 加载Steam库存数据
+    loadSteamInventory();
+
     // 加载初始数据
     loadData();
 
@@ -543,4 +546,27 @@ async function updateTotalBalance() {
         console.error('更新总余额失败:', error);
         showToast('更新失败: ' + error.message, 'error');
     }
+}
+
+// 加载Steam库存数据
+function loadSteamInventory() {
+    fetch('/api/steam_inventory')
+        .then(response => response.json())
+        .then(data => {
+            const tableBody = document.getElementById('steamInventoryTableBody');
+            tableBody.innerHTML = '';
+            
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.item_name}</td>
+                    <td>${item.quantity}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        })
+        .catch(error => {
+            console.error('加载Steam库存失败:', error);
+            alert('加载Steam库存失败，请检查控制台获取详细信息。');
+        });
 } 
