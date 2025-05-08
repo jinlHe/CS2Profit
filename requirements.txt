@@ -8,7 +8,7 @@ beautifulsoup4==4.12.3
 certifi==2025.4.26
 charset-normalizer==3.4.2
 idna==3.10
-numpy==1.26.4
+numpy==1.24.3
 pandas==2.2.1
 python-dateutil==2.9.0.post0
 pytz==2025.2
@@ -17,4 +17,9 @@ selenium==4.16.0
 soupsieve==2.7
 tzdata==2025.2
 urllib3==2.4.0
-webdriver-manager==4.0.1 
+webdriver-manager==4.0.1
+easyocr==1.7.1
+torch==2.1.0
+Pillow==10.2.0
+opencv-python==4.8.0.74
+pytesseract==0.3.10 
