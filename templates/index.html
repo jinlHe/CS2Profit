@@ -161,7 +161,10 @@
         <!-- 标签页导航 -->
         <ul class="nav nav-tabs" id="tradeTabs" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="holdings-tab" data-bs-toggle="tab" data-bs-target="#holdings" type="button" role="tab" aria-controls="holdings" aria-selected="true">持有记录</button>
+                <button class="nav-link active" id="steam-inventory-tab" data-bs-toggle="tab" data-bs-target="#steam-inventory" type="button" role="tab" aria-controls="steam-inventory" aria-selected="true">Steam库存</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="holdings-tab" data-bs-toggle="tab" data-bs-target="#holdings" type="button" role="tab" aria-controls="holdings" aria-selected="false">持有记录</button>
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="completed-tab" data-bs-toggle="tab" data-bs-target="#completed" type="button" role="tab" aria-controls="completed" aria-selected="false">成交记录</button>
@@ -170,8 +173,25 @@
 
         <!-- 标签页内容 -->
         <div class="tab-content" id="tradeTabsContent">
+            <!-- Steam库存 -->
+            <div class="tab-pane fade show active" id="steam-inventory" role="tabpanel" aria-labelledby="steam-inventory-tab">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th class="sortable" data-sort="item_name">物品名称</th>
+                                <th class="sortable" data-sort="quantity">数量</th>
+                            </tr>
+                        </thead>
+                        <tbody id="steamInventoryTableBody">
+                            <!-- Steam库存将通过JavaScript动态填充 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
             <!-- 持有记录 -->
-            <div class="tab-pane fade show active" id="holdings" role="tabpanel" aria-labelledby="holdings-tab">
+            <div class="tab-pane fade" id="holdings" role="tabpanel" aria-labelledby="holdings-tab">
                 <div class="table-responsive">
                     <table class="table">
                         <thead>
